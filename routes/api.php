@@ -11,3 +11,6 @@ Route::group(['prefix'=>'guest'],function(){
     Route::post('signin',[UserController::class,'signup'])->name('guest.signin');
     Route::post('login',[UserController::class,'login'])->name('guest.login');
 });
+Route::group(['middleware'=>'auth:sanctum'],function(){
+    
+});
