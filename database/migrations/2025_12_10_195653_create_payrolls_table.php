@@ -18,6 +18,7 @@ return new class extends Migration
             $table->date('year');
             $table->double('gross_salary');
             $table->double('net_salary');
+            $table->foreign('employee_id')->references('id')->on('employees')->onDelete('cascade');
             $table->timestamps();
         });
     }

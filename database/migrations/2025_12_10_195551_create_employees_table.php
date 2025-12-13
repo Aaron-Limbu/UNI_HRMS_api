@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('employees', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInterger('user_id');
+            $table->unsignedBigInteger('user_id');
             $table->string('employee_code');
             $table->enum('employment_type',['permanent','contract']);
             $table->date('join_date');
-            $table->unsignedBigInterger('department_id');
-            $table->unsignedBigInterger('designation_id');
+            $table->unsignedBigInteger('department_id');
+            $table->unsignedBigInteger('designation_id');
             $table->enum('status',['active','resigned','terminated']);
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('department_id')->references('id')->on('departments')->onDelete('cascade');

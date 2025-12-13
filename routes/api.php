@@ -3,14 +3,23 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AdminController;
+// Route::get('/user', function (Request $request) {
+//     return $request->user();
+// })->middleware('auth:sanctum');
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
-Route::group(['prefix'=>'guest'],function(){
-    Route::post('signin',[UserController::class,'signup'])->name('guest.signin');
-    Route::post('login',[UserController::class,'login'])->name('guest.login');
+Route::group(['prefix' => 'guest'], function () {
+    Route::post('signin', [UserController::class, 'signup'])->name('guest.signin');
+    Route::post('login', [UserController::class, 'login'])->name('guest.login');
 });
-Route::group(['middleware'=>'auth:sanctum'],function(){
-    
+
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::post('logout', [UserController::class, 'logout'])->name('user.logout');
+    Route::middleware('abilities:read')->group(function () {
+        Route::get('profile', [UserController::class, 'profile']);
+    });
+    Route::prefix('admin')->middleware('abilities:write')->group(function () {
+        Route::post('addEmp', [AdminController::class, 'addEmp'])->name('admin.addEmployee');
+        Route::get('allEmp', [AdminController::class, 'showAllEmployees'])->name('admin.allEmp');
+    });
 });

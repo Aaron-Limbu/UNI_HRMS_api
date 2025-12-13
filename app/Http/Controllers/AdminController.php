@@ -14,11 +14,20 @@ use App\Interface\EmpInterface;
 class AdminController extends Controller
 {
     private EmpInterface $empInterface; 
-    public function __constructc(EmpInterface $empInterface){
+    public function __construct(EmpInterface $empInterface){
         $this->empInterface = $empInterface; 
     }   
     public function showAllEmployees(){
-
+        try{
+            $data = $this->empInterface->showAll(); 
+            if(count($data)>0){
+                return ApiResponse::sendResponse(EmployeeResource::collection($data),'employees',200,'');
+            }else{
+                return ApiResponse::sendResponse('','no employees are stored',404,'');
+            }
+        }catch(Exception $e){
+            return ApiResponse::rollback($e,'failed');
+        }
     } 
     public function getEmp(){
 

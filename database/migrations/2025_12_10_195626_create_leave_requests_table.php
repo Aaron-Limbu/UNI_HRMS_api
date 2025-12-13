@@ -21,7 +21,7 @@ return new class extends Migration
             $table->enum('status',['pending','approved','rejected']);
             $table->unsignedBigInteger('approved_by');
             $table->foreign('employee_id')->references('id')->on('employees')->onDelete('cascade');
-            $table->foreign('leaveType_id')->references('id')->on('leaveTypes')->onDelete('cascade');
+            $table->foreign('leaveType_id')->references('id')->on('leave_types')->onDelete('cascade');
             $table->foreign('approved_by')->references('id')->on('employees')->onDelete('cascade');
             $table->timestamps();
         });

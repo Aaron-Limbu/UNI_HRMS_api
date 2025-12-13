@@ -9,7 +9,7 @@ class EmpRepo implements EmpInterface
 {
    
         public function showAll(){
-            return Employee::orderBy('created_at','ASC');
+            return Employee::orderBy('created_at','ASC')->get();
         }
         public function showEmp($id){
             return Employee::findOrFail($id);

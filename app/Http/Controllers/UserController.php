@@ -12,6 +12,7 @@ use App\Interface\UserInterface;
 use Illuminate\Support\Facades\Auth; 
 use Illuminate\Support\Facades\Hash; 
 use App\Class\ApiResponse;
+use App\Models\User;
 
 class UserController extends Controller
 {
@@ -41,11 +42,20 @@ class UserController extends Controller
     public function login(LoginRequest $request){
         try{
             if(Auth::attempt(['email'=>$request->email,'password'=>$request->password])){
-                $user = Auth::user();
-                return ApiResponse::sendResponse($success,'Login Successful!',200,'');
+                $user = User::where('email',$request->email)->first();
+                $abilities = ['read'];
+                if($user->role === "admin"){
+                    $abilities = ['read','write'];
+                }
+                $token = $user->createToken('api-token',$abilities)->plainTextToken;
+                return ApiResponse::sendResponse($token,'Login Successful!',200,'');
             }
         }catch(Exception $e){
             return ApiResponse::rollback($e);
         }
+    }
+    public function logout(Request $request){
+        $request->user()->currentAccessToken()->delete();
+        return ApiResponse::sendResponse('','logout',200,'');
     }
 }
