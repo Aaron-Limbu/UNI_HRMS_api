@@ -16,10 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-         $middleware->group('api', [
-            'throttle:api',
-            SubstituteBindings::class,
-        ]);
+        //  $middleware->group('api', [
+        //     'throttle:api',
+        //     SubstituteBindings::class,
+        // ]);
 
         $middleware->alias([
             'abilities' => CheckAbilities::class,

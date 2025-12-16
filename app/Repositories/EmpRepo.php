@@ -20,5 +20,9 @@ class EmpRepo implements EmpInterface
         public function delete($id){
             return Employee::destroy($id);
         }
-    
+        public function getAllStaff(){
+            return Employee::with('user')->whereHas('user',function($q){
+                $q->where('role','staff');
+            })->orderBy('created_at','ASC')->get();
+        }
 }

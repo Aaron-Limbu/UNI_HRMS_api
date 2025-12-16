@@ -18,8 +18,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::middleware('abilities:read')->group(function () {
         Route::get('profile', [UserController::class, 'profile']);
     });
-    Route::prefix('admin')->middleware('abilities:write')->group(function () {
+
+});
+Route::prefix('admin')->group(function () {
+    Route::post('login',[AdminController::class,'login'])->name('admin.login');
+    Route::middleware(['auth:sanctum','abilities:write'])->group(function(){
         Route::post('addEmp', [AdminController::class, 'addEmp'])->name('admin.addEmployee');
         Route::get('allEmp', [AdminController::class, 'showAllEmployees'])->name('admin.allEmp');
+        Route::get('staffs',[AdminController::class,'showAllStaff'])->name('admin.allStaffs');
     });
 });

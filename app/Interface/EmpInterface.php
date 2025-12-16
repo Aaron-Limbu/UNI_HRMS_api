@@ -8,5 +8,5 @@ interface EmpInterface
     public function showEmp($id);
     public function store(array $data);
     public function delete($id);
-    
+    public function getAllStaff();
 }

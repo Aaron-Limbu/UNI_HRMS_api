@@ -30,7 +30,8 @@ class UserController extends Controller
                 'password'=>Hash::make($request->password),
                 'gender'=>$request->gender,
                 'address'=>$request->address,
-                'fathers_name'=>$request->fathers_name
+                'fathers_name'=>$request->fathers_name,
+                'role'=>'student'
             ];
             $user = $this->userInterface->store($details);
             DB::commit();
@@ -44,11 +45,10 @@ class UserController extends Controller
             if(Auth::attempt(['email'=>$request->email,'password'=>$request->password])){
                 $user = User::where('email',$request->email)->first();
                 $abilities = ['read'];
-                if($user->role === "admin"){
-                    $abilities = ['read','write'];
-                }
                 $token = $user->createToken('api-token',$abilities)->plainTextToken;
                 return ApiResponse::sendResponse($token,'Login Successful!',200,'');
+            }else{
+                return ApiResponse::sendResponse('','either email or password is incorrect',401,'');
             }
         }catch(Exception $e){
             return ApiResponse::rollback($e);
