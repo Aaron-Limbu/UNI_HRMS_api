@@ -17,8 +17,8 @@ return new class extends Migration
             $table->string('employee_code');
             $table->enum('employment_type',['permanent','contract']);
             $table->date('join_date');
-            $table->unsignedBigInteger('department_id');
-            $table->unsignedBigInteger('designation_id');
+            $table->unsignedBigInteger('department_id')->nullable();
+            $table->unsignedBigInteger('designation_id')->nullable();
             $table->enum('status',['active','resigned','terminated']);
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('department_id')->references('id')->on('departments')->onDelete('cascade');

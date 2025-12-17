@@ -12,13 +12,19 @@ use App\Interface\EmpInterface;
 use App\Http\Requests\LoginRequest;
 use Auth;
 use App\Models\User;
+use App\Interface\UserInterface;
+use App\Http\Resources\UserResource;
+
 
 class AdminController extends Controller
 {
     private EmpInterface $empInterface; 
-    public function __construct(EmpInterface $empInterface){
+    private UserInterface $userInterface;
+    public function __construct(EmpInterface $empInterface,UserInterface $userInterface){
         $this->empInterface = $empInterface; 
+        $this->userInterface = $userInterface;
     }   
+
     public function login(LoginRequest $request){
         try{
             if(Auth::guard('admin')->attempt(['email'=>$request->email,'password'=>$request->password])){
@@ -62,24 +68,25 @@ class AdminController extends Controller
             return ApiResponse::rollback($e,'failed');
         }
     }
-    public function addStaff(){
-        // DB::beginTransaction();
-        // try{
-        //     $details = [
-        //         'user_id'=>$requset->user_id,
-        //         'employee_code'=>$request->emp_code,
-        //         'employment_type'=>$request->emp_type,
-        //         'join_date'=>$request->join_date,
-        //         'department_id'=>$request->dep_id,
-        //         'designation_id'=>$request->desig_id,
-        //         'status'=>$request->status,
-        //     ];
-        //     $employee = $this->empInterface->store($details);
-        //     DB::commit();
-        //     return ApiResponse::sendResponse(new EmployeeResource($employee),'employee has been added.',201,'');
-        // }catch(Exception $e){
-        //     return ApiResponse::rollback($e);
-        // }
+    public function addStaff(AddEmp $request){
+        DB::beginTransaction();
+        try{
+            $details = [
+                'user_id'=>$requset->user_id,
+                'employee_code'=>$request->emp_code,
+                'employment_type'=>$request->emp_type,
+                'join_date'=>$request->join_date,
+                'department_id'=>$request->dep_id,
+                'designation_id'=>$request->desig_id,
+                'status'=>$request->status,
+            ];
+            $employee = $this->empInterface->store($details);
+            $user = $this->userInterface->updateRole($request->user_id,"staff");
+            DB::commit();
+            return ApiResponse::sendResponse([new EmployeeResource($employee),new UserResource($user)],'employee has been added.',201,'');
+        }catch(Exception $e){
+            return ApiResponse::rollback($e);
+        }
     }
     public function getStaffDetail(){
 

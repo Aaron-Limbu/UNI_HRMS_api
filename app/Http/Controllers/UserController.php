@@ -30,8 +30,7 @@ class UserController extends Controller
                 'password'=>Hash::make($request->password),
                 'gender'=>$request->gender,
                 'address'=>$request->address,
-                'fathers_name'=>$request->fathers_name,
-                'role'=>'student'
+                'fathers_name'=>$request->fathers_name
             ];
             $user = $this->userInterface->store($details);
             DB::commit();

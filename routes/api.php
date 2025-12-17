@@ -25,6 +25,7 @@ Route::prefix('admin')->group(function () {
     Route::middleware(['auth:sanctum','abilities:write'])->group(function(){
         Route::post('addEmp', [AdminController::class, 'addEmp'])->name('admin.addEmployee');
         Route::get('allEmp', [AdminController::class, 'showAllEmployees'])->name('admin.allEmp');
+        Route::post('addStaff',[AdminController::class,'addStaff'])->name('admin.addStaff');
         Route::get('staffs',[AdminController::class,'showAllStaff'])->name('admin.allStaffs');
     });
 });
