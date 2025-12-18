@@ -25,13 +25,13 @@ class AddEmp extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id'=>'required|numeric|in:users',
+            'user_id'=>'required|numeric|exists:users,id',
             'employee_code'=>'required',
-            'employee_type'=>'required|enum:permanent,contract',
+            'employee_type'=>'required|in:permanent,contract',
             'join_date'=>'required|date',
             'department_id'=>'nullable',
             'designation_id'=>'nullable',
-            'status'=>'required|enum:active,resigned,terminated'
+            'status'=>'required|in:active,resigned,terminated'
         ];
     }
     public function failedValidation(Validator $validator){

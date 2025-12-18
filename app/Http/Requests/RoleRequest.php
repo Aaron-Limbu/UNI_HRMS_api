@@ -24,7 +24,7 @@ class RoleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'role'=>'required|enum:student,teacher,staff'
+            'role'=>'required|in:student,teacher,staff'
         ];
     }
         public function failedValidation(Validator $validator){
