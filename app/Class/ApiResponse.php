@@ -16,12 +16,12 @@ class ApiResponse
         Log::info($e);
         throw new HttpResponseException(response()->json(["message"=>$message],500));
     }
-    public static function sendResponse($result,$message,$code=200,$redirectUrl=null){
+    public static function sendResponse($result,$message = null,$code=200,$redirectUrl=null){
         $response = [
             'success'=>true,
             'data'=>$result
         ];
-        if(!empty($message)){
+        if($message){
             $response['message']=$message; 
         }if($redirectUrl){
             $response['redirect_url']=$redirectUrl;

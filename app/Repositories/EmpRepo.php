@@ -23,9 +23,12 @@ class EmpRepo implements EmpInterface
         public function getAllStaff(){
             return Employee::whereHas('user', function($q){
                     $q->where('role','staff');
-                })
-                ->with(['user:id,name,email,role'])
-                ->get();
-
+                })->with(['user:id,name,email,role'])->get();
+        }
+        public function getStaff($id){
+            return Employee::with(['user:id,name,email,role'])->findOrFail($id);
+        }
+        public function updateStaffDetail($id,array $data){
+            return Employee::where('id',$id)->update($data);
         }
 }

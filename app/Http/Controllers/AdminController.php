@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use DB;
 use Exception; 
 use App\Class\ApiResponse;
-use App\Http\Requests\AddEmp;
+use App\Http\Requests\Emp;
 use App\Http\Resources\EmployeeResource;
 use App\Interface\EmpInterface; 
 use App\Http\Requests\LoginRequest;
@@ -46,29 +46,22 @@ class AdminController extends Controller
     public function showAllEmployees(){
         try{
             $data = $this->empInterface->showAll(); 
-            if(count($data)>0){
-                return ApiResponse::sendResponse(EmployeeResource::collection($data),'employees',200,'');
-            }else{
-                return ApiResponse::sendResponse('','no employees are stored',404,'');
-            }
+            return ApiResponse::sendResponse(['employees'=>EmployeeResource::collection($data)],'employees',200,'');
         }catch(Exception $e){
             return ApiResponse::rollback($e,'failed');
         }
     } 
 
     public function showAllStaff(){
-        try{
+        try {
             $data = $this->empInterface->getAllStaff(); 
-            if(count($data)>0){
-                return ApiResponse::sendResponse(EmployeeResource::collection($data),'staffs',200,'');
-            }else{
-                return ApiResponse::sendResponse('','no staffs are stored',404,'');
-            }
-        }catch(Exception $e){
-            return ApiResponse::rollback($e,'failed');
+            return ApiResponse::sendResponse(['staffs' => EmployeeResource::collection($data)], 'Staff list', 200);
+        } catch (Exception $e) {
+            return ApiResponse::rollback($e, 'Failed to fetch staffs');
         }
+
     }
-    public function addStaff(AddEmp $request){
+    public function addStaff(Emp $request){
         DB::beginTransaction();
         try{
             $details = [
@@ -83,16 +76,39 @@ class AdminController extends Controller
             $employee = $this->empInterface->store($details);
             $user = $this->userInterface->updateRole($request->user_id,"staff");
             DB::commit();
-            return ApiResponse::sendResponse([new EmployeeResource($employee),new UserResource($user)],'employee has been added.',201,'');
+            return ApiResponse::sendResponse(['employee'=> new EmployeeResource($employee),'user' => new UserResource($user)],'employee has been added.',201,'');
         }catch(Exception $e){
             return ApiResponse::rollback($e);
         }
     }
-    public function getStaffDetail(){
+    public function getStaffDetail($id){
+        try{
+            $staff = $this->empInterface->getStaff($id); 
+            return ApiResponse::sendResponse(['employee'=> new EmployeeResource($staff)],'staff detail',200,'');
+        }
+        catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return ApiResponse::sendResponse('', 'Staff not found', 404);
+        } 
+        catch(Exception $e){
+            return ApiResponse::rollback($e);
+        }
 
     }
-    public function updateStaff(){
-
+    public function updateStaff(Emp $request,$id){
+        DB::beginTransaction();
+        try{
+            $this->empInterface->updateStaffDetail(
+                collect(
+                    $request->validated())->only([
+                        'employee_code','employee_type','join_date','department_id','designation_id','status'
+                ])->toArray()
+            );
+            DB::commit();
+            return ApiResponse::sendResponse('','successfully updated staff',200);
+            
+        }catch(Exception $e){
+            return ApiResponse::rollback($e);
+        }
     }
     public function removeStaff(){
 
@@ -100,7 +116,7 @@ class AdminController extends Controller
     public function getEmp(){
 
     }
-    public function addEmp(AddEmp $request){
+    public function addEmp(Emp $request){
         DB::beginTransaction();
         try{
             $details = [

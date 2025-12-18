@@ -27,6 +27,7 @@ Route::prefix('admin')->group(function () {
         Route::get('allEmp', [AdminController::class, 'showAllEmployees'])->name('admin.allEmp');
         Route::post('addStaff',[AdminController::class,'addStaff'])->name('admin.addStaff');
         Route::get('staffs',[AdminController::class,'showAllStaff'])->name('admin.allStaffs');
+        Route::get('staff/{id}',[AdminController::class,'getStaffDetail'])->name('admin.getStaff');
         Route::patch('updateRole/{id}',[AdminController::class,'changeRole'])->name('admin.updateRole');
     });
 });

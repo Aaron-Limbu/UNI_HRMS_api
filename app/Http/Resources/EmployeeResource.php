@@ -15,9 +15,10 @@ class EmployeeResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'name'  => $this->user->name ?? null,
-            'email' => $this->user->email ?? null,
-            'role'  => $this->user->role ?? null,
+            'id'=>$this->user->id,
+            'name'=>$this->user->name ?? null,
+            'email'=>$this->user->email ?? null,
+            'role'=>$this->user->role ?? null,
             'employee_code'=>$this->employee_code,
             'employee_type'=>$this->employment_type,
             'join_date'=>$this->join_date,

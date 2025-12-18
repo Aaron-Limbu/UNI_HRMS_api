@@ -29,8 +29,8 @@ class AddEmp extends FormRequest
             'employee_code'=>'required',
             'employee_type'=>'required|in:permanent,contract',
             'join_date'=>'required|date',
-            'department_id'=>'nullable',
-            'designation_id'=>'nullable',
+            'department_id'=>'required|numeric|exists:departments,id',
+            'designation_id'=>'required|numeric|exists:designations,id',
             'status'=>'required|in:active,resigned,terminated'
         ];
     }
