@@ -14,7 +14,6 @@ class DepartmentSeeder extends Seeder
     public function run(): void
     {
         $departments = [
-            ['name' => 'HR'],
             ['name' => 'Computer Science & Engineering'],
             ['name' => 'Information Technology'],
             ['name' => 'Electrical & Electronics Engineering'],

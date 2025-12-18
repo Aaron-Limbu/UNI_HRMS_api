@@ -24,7 +24,7 @@ class UserController extends Controller
         DB::beginTransaction();
         try{
             $details = [
-                'name'=>$request->F_name.''.$request->L_name,
+                'name'=>$request->F_name.' '.$request->L_name,
                 'email'=>$request->email,
                 'phone'=>$request->phone,
                 'password'=>Hash::make($request->password),

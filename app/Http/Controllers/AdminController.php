@@ -14,7 +14,7 @@ use Auth;
 use App\Models\User;
 use App\Interface\UserInterface;
 use App\Http\Resources\UserResource;
-
+use App\Http\Requests\RoleRequest;
 
 class AdminController extends Controller
 {
@@ -119,4 +119,15 @@ class AdminController extends Controller
             return ApiResponse::rollback($e);
         }
     }
+    public function changeRole(RoleRequest $request,$id){
+        DB::beginTransaction();
+        try{
+            $this->userInterface->updateRole($id,$request->role);
+            DB::commit();
+            return ApiResponse::sendResponse('','user role has been changed',201,'');
+        }catch(Exception $e){
+            return ApiResponse::rollback($e);
+        }
+    }
+    
 }
