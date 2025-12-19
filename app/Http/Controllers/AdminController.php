@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use DB;
+use Log;
 use Exception; 
 use App\Class\ApiResponse;
 use App\Http\Requests\Emp;
@@ -15,15 +16,25 @@ use App\Models\User;
 use App\Interface\UserInterface;
 use App\Http\Resources\UserResource;
 use App\Http\Requests\RoleRequest;
+use App\Interface\StudentInterface;
+use App\Http\Resources\StudentResource;
+use App\Interface\ClassInterface;
+use App\Http\Resources\ClassResource;
 
 class AdminController extends Controller
 {
     private EmpInterface $empInterface; 
     private UserInterface $userInterface;
-    public function __construct(EmpInterface $empInterface,UserInterface $userInterface){
+    private StudentInterface $studentInterface;
+    private ClassInterface $classInterface;
+
+    public function __construct(EmpInterface $empInterface,UserInterface $userInterface,StudentInterface $studentInterface,ClassInterface $classInterface){
         $this->empInterface = $empInterface; 
         $this->userInterface = $userInterface;
-    }   
+        $this->studentInterface = $studentInterface;
+        $this->classInterface = $classInterface;
+
+    }  
 
     public function login(LoginRequest $request){
         try{
@@ -40,6 +51,9 @@ class AdminController extends Controller
                 return ApiResponse::sendResponse('','either email or password is incorrect',401,'');
             }
         }catch(Exception $e){
+            Log::error('Failed to login: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
             return ApiResponse::rollback($e,'failed');
         }
     }
@@ -48,6 +62,9 @@ class AdminController extends Controller
             $data = $this->empInterface->showAll(); 
             return ApiResponse::sendResponse(['employees'=>EmployeeResource::collection($data)],'employees',200,'');
         }catch(Exception $e){
+            Log::error('Failed to show employees:'.$e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
             return ApiResponse::rollback($e,'failed');
         }
     } 
@@ -57,6 +74,9 @@ class AdminController extends Controller
             $data = $this->empInterface->getAllStaff(); 
             return ApiResponse::sendResponse(['staffs' => EmployeeResource::collection($data)], 'Staff list', 200);
         } catch (Exception $e) {
+            Log::error('Failed to show staffs: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
             return ApiResponse::rollback($e, 'Failed to fetch staffs');
         }
 
@@ -78,6 +98,9 @@ class AdminController extends Controller
             DB::commit();
             return ApiResponse::sendResponse(['employee'=> new EmployeeResource($employee),'user' => new UserResource($user)],'employee has been added.',201,'');
         }catch(Exception $e){
+            Log::error('Failed to add staff: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
             return ApiResponse::rollback($e);
         }
     }
@@ -90,6 +113,9 @@ class AdminController extends Controller
             return ApiResponse::sendResponse('', 'Staff not found', 404);
         } 
         catch(Exception $e){
+            Log::error('Failed to get staff detail: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
             return ApiResponse::rollback($e);
         }
 
@@ -107,11 +133,26 @@ class AdminController extends Controller
             return ApiResponse::sendResponse('','successfully updated staff',200);
             
         }catch(Exception $e){
+            Log::error('Failed to update staff detail: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
             return ApiResponse::rollback($e);
         }
     }
-    public function removeStaff(){
-
+    public function removeStaff($id){
+        DB::beginTransaction();
+        try{
+            $this->empInterface->delete($id);
+            $role = "guest";
+            $this->userInterface->updateRole($id,$role);
+            DB::commit();
+            return ApiResponse::sendResponse('','staff removed',200,'');
+        }catch(Exception $e){
+            Log::error('Failed to remove staff: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            return ApiResponse::rollback($e);
+        }
     }
     public function getEmp(){
 
@@ -132,6 +173,9 @@ class AdminController extends Controller
             DB::commit();
             return ApiResponse::sendResponse(new EmployeeResource($employee),'employee has been added.',201,'');
         }catch(Exception $e){
+            Log::error('Failed to add Employee: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
             return ApiResponse::rollback($e);
         }
     }
@@ -142,8 +186,21 @@ class AdminController extends Controller
             DB::commit();
             return ApiResponse::sendResponse('','user role has been changed',201,'');
         }catch(Exception $e){
+            Log::error('Failed to change role: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
             return ApiResponse::rollback($e);
         }
     }
-    
+    public function students(){
+        try{
+            $students = $this->studentInterface->showAll();
+            return ApiResponse::sendResponse(['students'=>new StudentResource($students)],'students data',200,'');
+        }catch(Exception $e){
+            Log::error('Failed to fetch students: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            return ApiResponse::rollback($e);
+        }
+    }
 }

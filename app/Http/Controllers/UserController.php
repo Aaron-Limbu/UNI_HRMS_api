@@ -57,4 +57,9 @@ class UserController extends Controller
         $request->user()->currentAccessToken()->delete();
         return ApiResponse::sendResponse('','logout',200,'');
     }
+    public function profile(){
+        $id= Auth::id();
+        $user = $this->userInterface->info($id);
+        return ApiResponse::sendResponse(new UserResource($user),'profile info ',200,'');
+    }
 }
