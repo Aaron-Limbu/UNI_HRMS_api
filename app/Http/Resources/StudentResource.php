@@ -18,9 +18,13 @@ class StudentResource extends JsonResource
             'id'=>$this->id,
             'admission_no'=>$this->admission_no,
             'user_id'=>$this->user_id,
+            'name'=>$this->user->name,
             'class_id'=>$this->class_id,
             'section'=>$this->section,
-            'status'=>$this->status
+            'status'=>$this->status,
+            'classes'=> [
+                'name'=>$this->class->name ?? null
+            ]
         ];
     }
 }

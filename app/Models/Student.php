@@ -15,7 +15,7 @@ class Student extends Model
         'status'
     ];
     public function class(){
-        return $this->belongsToMany(Classes::class,'class_id');
+        return $this->belongsTo(Classes::class,'class_id');
     }
     public function user(){
         return $this->belongsTo(User::class,'user_id');

@@ -20,6 +20,10 @@ use App\Interface\StudentInterface;
 use App\Http\Resources\StudentResource;
 use App\Interface\ClassInterface;
 use App\Http\Resources\ClassResource;
+use App\Interface\DepartmentInterface;
+use App\Http\Resources\DepartmentResource;
+use App\Interface\DesignationInterface; 
+use App\Http\Resources\DesignationResource;
 
 class AdminController extends Controller
 {
@@ -27,13 +31,18 @@ class AdminController extends Controller
     private UserInterface $userInterface;
     private StudentInterface $studentInterface;
     private ClassInterface $classInterface;
+    private DepartmentInterface $departmentInterface;
+    private DesignationInterface $designationInterface; 
 
-    public function __construct(EmpInterface $empInterface,UserInterface $userInterface,StudentInterface $studentInterface,ClassInterface $classInterface){
+    public function __construct(EmpInterface $empInterface,UserInterface $userInterface,
+    StudentInterface $studentInterface,ClassInterface $classInterface,
+    DepartmentInterface $departmentInterface,DesignationInterface $designationInterface){
         $this->empInterface = $empInterface; 
         $this->userInterface = $userInterface;
         $this->studentInterface = $studentInterface;
         $this->classInterface = $classInterface;
-
+        $this->departmentInterface = $departmentInterface; 
+        $this->designationInterface = $designationInterface;
     }  
 
     public function login(LoginRequest $request){
@@ -195,7 +204,43 @@ class AdminController extends Controller
     public function students(){
         try{
             $students = $this->studentInterface->showAll();
-            return ApiResponse::sendResponse(['students'=>new StudentResource($students)],'students data',200,'');
+            return ApiResponse::sendResponse(['students'=>StudentResource::collection($students)],'students data',200,'');
+        }catch(Exception $e){
+            Log::error('Failed to fetch students: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            return ApiResponse::rollback($e);
+        }
+    }
+    public function showClasses(){
+        try{
+            $classes = $this->classInterface->showAll();
+            return ApiResponse::sendResponse(['classes'=>ClassResource::collection($classes)],'classes info',200,'');
+        }catch(Exception $e){
+            Log::error('Failed to fetch students: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            return ApiResponse::rollback($e);
+        }
+    }
+
+
+    public function showDepartments(){
+        try{
+            $departments = $this->departmentInterface->showAll(); 
+            return ApiResponse::sendResponse(['departments'=>DepartmentResource::collection($departments)],'departments',200);
+
+        }catch(Exception $e){
+            Log::error('Failed to fetch students: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            return ApiResponse::rollback($e);
+        }
+    }
+    public function showDesignations(){
+        try{
+            $designations = $this->designationInterface->showAll();
+            return ApiResponse::sendResponse(['designations'=>DesignationResource::collection($designations)],'designations',200);
         }catch(Exception $e){
             Log::error('Failed to fetch students: '.$e->getMessage(), [
                 'trace' => $e->getTraceAsString()

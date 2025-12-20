@@ -31,7 +31,10 @@ Route::prefix('admin')->group(function () {
         Route::get('staff/{id}',[AdminController::class,'getStaffDetail'])->name('admin.getStaff');
         Route::patch('updateRole/{id}',[AdminController::class,'changeRole'])->name('admin.updateRole');
         Route::delete('remove/staff/{id}',[AdminController::class,'removeStaff'])->name('admin.removeStaff');
+        Route::get('classes',[AdminController::class,'showClasses'])->name('admin.allClasses');
         Route::get('students',[AdminController::class,'students'])->name('admin.students');
+        Route::get('departments',[AdminController::class,'showDepartments'])->name('admin.allDepartments');
 
+        Route::get('designations',[AdminController::class,'showDesignations'])->name('admin.allDesignations');
     });
 });
