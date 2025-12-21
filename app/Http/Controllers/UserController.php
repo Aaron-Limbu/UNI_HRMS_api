@@ -13,12 +13,22 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash; 
 use App\Class\ApiResponse;
 use App\Models\User;
+use App\Http\Resources\ClassResource;
+use App\Interface\ClassInterface;
+use App\Repositories\ClassRepo;
+use App\Http\Resources\DepartmentResource; 
+use App\Interface\DepartmentInterface; 
+use App\Repositories\DepartmentRepo; 
 
 class UserController extends Controller
 {
-    private UserInterface $userInterface; 
-    public function __construct(UserInterface $userInterface){
+    private UserInterface $userInterface;
+    private ClassInterface $classInterface;  
+    public function __construct(UserInterface $userInterface,ClassInterface $classInterface,
+    DepartmentInterface $departmentInterface){
         $this->userInterface = $userInterface; 
+        $this->classInterface = $classInterface; 
+        $this->departmentInterface = $departmentInterface;
     }
     public function signup(SignupRequest $request){
         DB::beginTransaction();
@@ -61,5 +71,42 @@ class UserController extends Controller
         $id= Auth::id();
         $user = $this->userInterface->info($id);
         return ApiResponse::sendResponse(new UserResource($user),'profile info ',200,'');
+    }
+    public function showClasses(){
+        try{
+            $classes = $this->classInterface->showAll();
+            return ApiResponse::sendResponse(['classes'=>ClassResource::collection($classes)],'classes info',200,'');
+        }catch(Exception $e){
+            Log::error('Failed to fetch classes: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            return ApiResponse::rollback($e);
+        }
+    }
+    public function showDepartments(){
+        try{
+            $departments = $this->departmentInterface->showAll(); 
+            return ApiResponse::sendResponse(['departments'=>DepartmentResource::collection($departments)],'departments',200);
+
+        }catch(Exception $e){
+            Log::error('Failed to fetch departments: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            return ApiResponse::rollback($e);
+        }
+    }
+    public function getClass($id){
+        try{
+            $class = $this->classInterface->getDetail($id); 
+            return ApiResponse::sendResponse(['class'=>new ClassResource($class)],'class',200);
+        }catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return ApiResponse::sendResponse('', 'class not found', 404);
+        } 
+        catch(Exception $e){
+            Log::error('Failed to get class: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            return ApiResponse::rollback($e);
+        }
     }
 }

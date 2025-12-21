@@ -20,6 +20,7 @@ use App\Interface\StudentInterface;
 use App\Http\Resources\StudentResource;
 use App\Interface\ClassInterface;
 use App\Http\Resources\ClassResource;
+use App\Http\Requests\classReq;
 use App\Interface\DepartmentInterface;
 use App\Http\Resources\DepartmentResource;
 use App\Interface\DesignationInterface; 
@@ -217,13 +218,42 @@ class AdminController extends Controller
             $classes = $this->classInterface->showAll();
             return ApiResponse::sendResponse(['classes'=>ClassResource::collection($classes)],'classes info',200,'');
         }catch(Exception $e){
-            Log::error('Failed to fetch students: '.$e->getMessage(), [
+            Log::error('Failed to fetch classes: '.$e->getMessage(), [
                 'trace' => $e->getTraceAsString()
             ]);
             return ApiResponse::rollback($e);
         }
     }
-
+    public function addClasses(classReq $request){
+        DB::beginTransaction();
+        try{
+            $details = [
+                'name'=>$request->name,
+            ];
+            $class= $this->classInterface->Create($details); 
+            DB::commit();
+            return ApiResponse::sendResponse(['class'=>new ClassResource($class)],'successfully added class',201);
+        }catch(Exception $e){
+            Log::error('Failed to add class: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            return ApiResponse::rollback($e);
+        }
+    }
+    public function getClass($id){
+        try{
+            $class = $this->classInterface->getDetail($id); 
+            return ApiResponse::sendResponse(['class'=>new ClassResource($class)],'class',200);
+        }catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return ApiResponse::sendResponse('', 'class not found', 404);
+        } 
+        catch(Exception $e){
+            Log::error('Failed to get class: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            return ApiResponse::rollback($e);
+        }
+    }
 
     public function showDepartments(){
         try{
@@ -231,7 +261,7 @@ class AdminController extends Controller
             return ApiResponse::sendResponse(['departments'=>DepartmentResource::collection($departments)],'departments',200);
 
         }catch(Exception $e){
-            Log::error('Failed to fetch students: '.$e->getMessage(), [
+            Log::error('Failed to fetch departments: '.$e->getMessage(), [
                 'trace' => $e->getTraceAsString()
             ]);
             return ApiResponse::rollback($e);
@@ -242,7 +272,7 @@ class AdminController extends Controller
             $designations = $this->designationInterface->showAll();
             return ApiResponse::sendResponse(['designations'=>DesignationResource::collection($designations)],'designations',200);
         }catch(Exception $e){
-            Log::error('Failed to fetch students: '.$e->getMessage(), [
+            Log::error('Failed to fetch designations: '.$e->getMessage(), [
                 'trace' => $e->getTraceAsString()
             ]);
             return ApiResponse::rollback($e);

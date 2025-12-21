@@ -17,6 +17,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('logout', [UserController::class, 'logout'])->name('user.logout');
     Route::middleware('abilities:read')->group(function () {
         Route::get('profile', [UserController::class, 'profile'])->name('user.profile');
+        Route::get('class',[UserController::class,'showClasses'])->name('user.showClasses');
+        Route::get('class/{id}',[UserController::class,'getClass'])->name('user.getClass');
+        Route::get('departments',[UserController::class,'showDepartments'])->name('user.showDepartments');
     });
 
 });
@@ -32,7 +35,11 @@ Route::prefix('admin')->group(function () {
         Route::patch('updateRole/{id}',[AdminController::class,'changeRole'])->name('admin.updateRole');
         Route::delete('remove/staff/{id}',[AdminController::class,'removeStaff'])->name('admin.removeStaff');
         Route::get('classes',[AdminController::class,'showClasses'])->name('admin.allClasses');
+        Route::post('addClass',[AdminController::class,'addClasses'])->name('admin.addClasses');
+        Route::get('class/{id}',[AdminController::class,'getClass'])->name('admin.getClass');
+
         Route::get('students',[AdminController::class,'students'])->name('admin.students');
+        
         Route::get('departments',[AdminController::class,'showDepartments'])->name('admin.allDepartments');
 
         Route::get('designations',[AdminController::class,'showDesignations'])->name('admin.allDesignations');
