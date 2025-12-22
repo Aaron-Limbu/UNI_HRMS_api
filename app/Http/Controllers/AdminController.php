@@ -25,6 +25,10 @@ use App\Interface\DepartmentInterface;
 use App\Http\Resources\DepartmentResource;
 use App\Interface\DesignationInterface; 
 use App\Http\Resources\DesignationResource;
+use App\Http\Resources\AttenResource;
+use App\Interface\AttenInterface;
+use App\Http\Requests\AttenReq;
+
 
 class AdminController extends Controller
 {
@@ -34,16 +38,19 @@ class AdminController extends Controller
     private ClassInterface $classInterface;
     private DepartmentInterface $departmentInterface;
     private DesignationInterface $designationInterface; 
+    private AttenInterface $attendanceInterface;
 
     public function __construct(EmpInterface $empInterface,UserInterface $userInterface,
     StudentInterface $studentInterface,ClassInterface $classInterface,
-    DepartmentInterface $departmentInterface,DesignationInterface $designationInterface){
+    DepartmentInterface $departmentInterface,DesignationInterface $designationInterface,
+    AttenInterface $attendanceInterface){
         $this->empInterface = $empInterface; 
         $this->userInterface = $userInterface;
         $this->studentInterface = $studentInterface;
         $this->classInterface = $classInterface;
         $this->departmentInterface = $departmentInterface; 
         $this->designationInterface = $designationInterface;
+        $this->attendanceInterface = $attendanceInterface;
     }  
 
     public function login(LoginRequest $request){
@@ -213,6 +220,21 @@ class AdminController extends Controller
             return ApiResponse::rollback($e);
         }
     }
+    public function getStudent($id){
+        try{
+            $student = $this->studentInterface->getStudent($id);
+            return ApiResponse::sendResponse(['student'=>new StudentResource($student)],'student info',200);
+        }catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return ApiResponse::sendResponse('', 'student not found', 404);
+        } 
+        catch(Exception $e){
+            Log::error('Failed to fetch student: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            return ApiResponse::rollback($e);
+        }
+    }
+
     public function showClasses(){
         try{
             $classes = $this->classInterface->showAll();
@@ -278,4 +300,38 @@ class AdminController extends Controller
             return ApiResponse::rollback($e);
         }
     }
+
+    public function showAttendances(){
+        try{
+            $attendances = $this->attendanceInterface->showAll();
+            return ApiResponse::sendResponse(['attendances'=>AttenResource::collection($attendances)],'attendances',200);
+        }catch(Exception $e){
+            Log::error('Failed to fetch attendances: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            return ApiResponse::rollback($e);
+        }
+    }
+
+    public function addAttendance(AttenReq $request){
+        DB::beginTransaction();
+        try{
+            $details = [
+                'user_id'=>$request->user_id,
+                'date'=>$request->date,
+                'check_in'=>$request->check_in,
+                'check_out'=>$request->check_out,
+                'status'=>$request->status
+            ];
+            $attendance = $this->AttenInterface->create($details);
+            DB::commit();
+            return ApiResponse::sendResponse(['attendance'=>new AttenResource($attendance)],'attendance added',201);
+        }catch(Exception $e){
+            Log::error('Failed to add attendance: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            return ApiResponse::rollback($e);
+        }
+    }
+
 }

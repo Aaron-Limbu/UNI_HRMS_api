@@ -11,4 +11,7 @@ class StudentRepo implements StudentInterface
             $q->where('role','student');
         })->with(['user:id,name,email','class:id,name'])->get();
     }
+    public function getStudent($id){
+        return Student::with(['user:id,name,email'])->findOrFail($id);
+    }
 }

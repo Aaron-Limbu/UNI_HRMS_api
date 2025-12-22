@@ -39,9 +39,11 @@ Route::prefix('admin')->group(function () {
         Route::get('class/{id}',[AdminController::class,'getClass'])->name('admin.getClass');
 
         Route::get('students',[AdminController::class,'students'])->name('admin.students');
-        
+        Route::get('student/{id}',[AdminController::class,'getStudent'])->name('admin.getStudent');
         Route::get('departments',[AdminController::class,'showDepartments'])->name('admin.allDepartments');
 
         Route::get('designations',[AdminController::class,'showDesignations'])->name('admin.allDesignations');
+
+        Route::get('attendances',[AdminController::class,'showAttendances'])->name('admin.allAttendances');
     });
 });

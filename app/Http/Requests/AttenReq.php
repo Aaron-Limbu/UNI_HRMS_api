@@ -3,8 +3,10 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator; 
+use Illuminate\Http\Exceptions\HttpResponseException; 
 
-class classReq extends FormRequest
+class AttenReq extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,7 +24,11 @@ class classReq extends FormRequest
     public function rules(): array
     {
         return [
-            'name'=>'required|string'
+            'user_id'=>'required|exists:users,id',
+            'date'=>'required|date',
+            'check_in'=>'required|timezone',
+            'check_out'=>'required|timezone',
+            'status'=>'required|in:present,absent,late,leave',
         ];
     }
     public function failedValidation(Validator $validator){

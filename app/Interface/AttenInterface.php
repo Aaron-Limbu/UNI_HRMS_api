@@ -2,8 +2,8 @@
 
 namespace App\Interface;
 
-interface StudentInterface
+interface AttenInterface
 {
     public function showAll();
-    public function getStudent($id);
+    public function create(array $data);
 }
