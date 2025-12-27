@@ -5,4 +5,5 @@ namespace App\Interface;
 interface DesignationInterface
 {
     public function showAll();
+    public function getDesig($id);
 }

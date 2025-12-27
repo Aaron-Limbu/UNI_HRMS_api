@@ -9,4 +9,7 @@ class DesignationRepo implements DesignationInterface
     public function showAll(){
         return Designation::all();
     }
+    public function getDesig($id){
+        return Designation::findOrFail($id);
+    }
 }

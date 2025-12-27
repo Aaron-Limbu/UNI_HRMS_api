@@ -289,6 +289,19 @@ class AdminController extends Controller
             return ApiResponse::rollback($e);
         }
     }
+    public function departmentDetail($id){
+        try{
+            $department = $this->departmentInterface->getDepartment($id);
+            return ApiResponse::sendResponse(['department'=>new DepartmentResource($department)],'department',200);
+        }catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return ApiResponse::sendResponse('', 'department not found', 404);
+        } catch(Exception $e){
+            Log::error('Failed to fetch department: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            return ApiResponse::rollback($e);
+        }
+    }
     public function showDesignations(){
         try{
             $designations = $this->designationInterface->showAll();
@@ -300,7 +313,19 @@ class AdminController extends Controller
             return ApiResponse::rollback($e);
         }
     }
-
+    public function Designation($id){
+        try{
+            $desgination = $this->designationInterface->getDesig($id);
+            return ApiResponse::sendResponse(['designation'=>new DesignationResource($desgination)],'designation',200);
+        }catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return ApiResponse::sendResponse('', 'Designation not found', 404);
+        } catch(Exception $e){
+            Log::error('Failed to fetch designation: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            return ApiResponse::rollback($e);
+        }
+    }
     public function showAttendances(){
         try{
             $attendances = $this->attendanceInterface->showAll();
@@ -312,7 +337,20 @@ class AdminController extends Controller
             return ApiResponse::rollback($e);
         }
     }
-
+    public function attendance($id){
+        try{
+            $attendance = $this->attendanceInterface->getAttendance($id);
+            return ApiResponse::sendResponse(['attendance'=>new AttenResource($attendance)],'attendance',200);
+        }catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return ApiResponse::sendResponse('', 'Attendance not found', 404);
+        } catch(Exception $e){
+            Log::error('Failed to fetch attendance: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            return ApiResponse::rollback($e);
+        }
+    }
+    
     public function addAttendance(AttenReq $request){
         DB::beginTransaction();
         try{
